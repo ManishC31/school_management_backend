@@ -13,9 +13,9 @@ exports.ApiError = (res, code = 400, message) => {
   });
 };
 
-exports.InternalError = (res, message) => {
+exports.InternalError = (res) => {
   return res.status(500).json({
-    successL: false,
-    message: message,
+    success: false,
+    message: "Something went wrong !",
   });
 };

@@ -42,13 +42,13 @@ exports.loginUser = asyncHandler(async (req, res) => {
     if (role === "student") {
       userData = (
         await client.query(
-          `select * from eb.student where credential_id = ${existingUser[0].id}`
+          `select * from main.student where credential_id = ${existingUser[0].credential_id}`
         )
       ).rows[0];
     } else if (role === "teacher") {
       userData = (
         await client.query(
-          `select * from eb.teacher where credential_id = ${existingUser[0].id}`
+          `select * from main.teacher where credential_id = ${existingUser[0].credential_id}`
         )
       ).rows[0];
     }

@@ -19,6 +19,7 @@ exports.createNewUser = asyncHandler(async (req, res) => {
 
     const encPassword = await bcrypt.hash(password, 10);
 
+    await client.query("begin");
     const credentialResponse = (
       await client.query(
         `insert into main.credentials (email, password, role) values ($1, $2, $3) returning *`,
@@ -30,17 +31,19 @@ exports.createNewUser = asyncHandler(async (req, res) => {
 
     const userResponse = (
       await client.query(
-        `insert into main.users (name, date_of_birth, gender, credential_id) values ($1, $2, $3, $4) returning *`,
-        [name, dateOfBirth, gender, credentialResponse.id]
+        `insert into main.student (name, date_of_birth, gender, credential_id) values ($1, $2, $3, $4) returning *`,
+        [name, dateOfBirth, gender, credentialResponse.credential_id]
       )
     ).rows[0];
 
     console.log("userResponse", userResponse);
 
+    await client.query("commit");
     return ApiResponse(res, 201, "user created successfully", userResponse);
   } catch (error) {
-    console.log("createNewUser err:", error);
-    InternalError(res);
+    console.log("createNewUser err:", error.message);
+    await client.query("rollback");
+    InternalError(res, error.message);
   } finally {
     client.release();
   }
